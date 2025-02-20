@@ -60,13 +60,13 @@ export default function IntentGenerator() {
       const abiCoder = new ethers.utils.AbiCoder();
       const orderData = abiCoder.encode([abiFragment[0]], [[
         "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-        ethers.BigNumber.from(amount*(10**6)),
+        amount*(10**6),        
         "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-        ethers.BigNumber.from(Math.floor(parseFloat(amount) * 0.998)), // 0.2% slippage
-        ethers.BigNumber.from("42161"),
+        9980000,
+        42161,
         paddedDepositor,
         "0x0000000000000000000000000000000000000000",
-        ethers.BigNumber.from("0"),
+        0,
         0,
         "0x"
       ]]);
