@@ -2,19 +2,45 @@
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { FaRegCopy } from "react-icons/fa";
+import { AcrossClient } from "@across-protocol/app-sdk";
+import { arbitrum, base } from "viem/chains";
+import { parseUnits } from 'viem'
+
+
+const client = AcrossClient.create({
+  integratorId: "0xdead", // 2-byte hex string
+  chains: [base, arbitrum],
+});
 
 
 export default function IntentGenerator() {
   const [walletAddress, setWalletAddress] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(0);
   const [result, setResult] = useState(null);  
   const [error, setError] = useState({ address: '', amount: '' });
+  const [gasFee, setGasFee] = useState(0);
 
 
   const copyToClipboard = async (text) => {
       await navigator.clipboard.writeText(text);
 
   };
+
+  const getFees = async () => {
+    try {
+      const res = await fetch(`https://app.across.to/api/suggested-fees?inputToken=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&outputToken=0xaf88d065e77c8cC2239327C5EDb3A432268e5831&originChainId=8453&destinationChainId=42161&amount=${amount*(10**6)}`);
+      
+      const data = await res.json();
+      // console.log(data);
+      const output = (amount*(10**6)) - data.totalRelayFee.total;
+      // console.log(output);
+      return output;
+    } catch (error) {
+      console.error("Error fetching fees:", error);
+      throw error;
+    }
+  }
+
 
 
 
@@ -29,6 +55,12 @@ export default function IntentGenerator() {
   };
 
   const generateIntent = async () => {
+    if(amount === 0){
+      return
+    }
+
+    const outputAmount = await getFees()
+    console.log("outputAmount", outputAmount)
     // Reset states
     setError({ address: '', amount: '' });
     setResult(null);
@@ -62,7 +94,7 @@ export default function IntentGenerator() {
         "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
         amount*(10**6),        
         "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-        9980000,
+        outputAmount,
         42161,
         paddedDepositor,
         "0x0000000000000000000000000000000000000000",
@@ -131,6 +163,13 @@ export default function IntentGenerator() {
             className="w-full border border-[#6de1c7] text-[#6de1c7] hover:bg-[#6de1c7] hover:text-[#2d2e33] font-bold py-2 px-4 rounded-md uppercase"
           >
             Generate Intent
+          </button>
+
+          <button
+            onClick={getFees}
+            className="w-full border border-[#6de1c7] text-[#6de1c7] hover:bg-[#6de1c7] hover:text-[#2d2e33] font-bold py-2 px-4 rounded-md uppercase"
+          >
+            Get Fee
           </button>
 
           {error.general && (
