@@ -18,7 +18,6 @@ export default function IntentGenerator() {
   const [amount, setAmount] = useState(0);
   const [result, setResult] = useState(null);  
   const [error, setError] = useState({ address: '', amount: '' });
-  const [gasFee, setGasFee] = useState(0);
 
 
   const copyToClipboard = async (text) => {
@@ -163,13 +162,6 @@ export default function IntentGenerator() {
             className="w-full border border-[#6de1c7] text-[#6de1c7] hover:bg-[#6de1c7] hover:text-[#2d2e33] font-bold py-2 px-4 rounded-md uppercase"
           >
             Generate Intent
-          </button>
-
-          <button
-            onClick={getFees}
-            className="w-full border border-[#6de1c7] text-[#6de1c7] hover:bg-[#6de1c7] hover:text-[#2d2e33] font-bold py-2 px-4 rounded-md uppercase"
-          >
-            Get Fee
           </button>
 
           {error.general && (
